@@ -5,11 +5,64 @@
   </head>
   <body>
     <a-scene>
+      <!-- cursor/make it FPS -->
+       <a-camera look-controls="pointerLockEnabled: true">
+        <a-cursor></a-cursor>
+         <!-- Gun -->
+       <a-entity id="gun" position="0.3 -0.3 -0.5">
+        <!-- muzzle position for bullets -->
+      <a-entity id="gunBarrel" position="0 0.131 -0.5"></a-entity>
+        <a-cylinder position="0 0.131 -0.2" radius="0.05" height="0.4" rotation="90 0 0" color="#333"></a-cylinder>
+        <a-box position="0 0.10 0.05" scale="0.12 0.16 0.25" color="#444"></a-box>
+        <a-box position="0 0 0.1" scale="0.08 0.15 0.1" color="#444"></a-box>
+        <a-box position="0 0.01 0.02" scale="0.11 0.05 0.04" color="#000000"></a-box>
+        <a-box position="0.01 0.2 0.19" scale="0.02 0.02 0.02" color="#666"></a-box>
+        <a-box position="-0.07 0.2 0.19" scale="0.02 0.02 0.02" color="#666"></a-box>
+       </a-entity>
+      </a-camera>
+       <!-- Zombie 1 -->
+        
       <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
       <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
       <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
       <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
       <a-sky color="#ECECEC"></a-sky>
     </a-scene>
+    <!-- Bullets -->
+     <script>
+
+      const scene = document.querySelector('a-scene');
+      //gather payers viewpoint
+      const camera= document.querySelector('a-camera');
+      //where bullets spawn from
+      const gun = document.getElementById('gunBarrel');
+//create specified bullet when mouse clicked
+      document.addEventListener('click', function(){
+      const bullet = document.createElement('a-sphere');
+      bullet.setAttribute('radius', '0.05');
+      bullet.setAttribute('color', '#808080');
+// make bullets come from gun
+// vector3 stores the position of the entity which means the bullets will come from wherever the gunBarrels posiition is in the world
+      const gunPosition = new THREE.Vector3();
+      gun.object3D.getWorldPosition(gunPosition);
+//direction from camera
+//vector3 position means shoot bullets straight ahead and then applyAuaternion is so the vector can rotate and shoot bullets wherever the camera is looking
+      const dir = new THREE.Vector3(0, 0, -1);
+      dir.applyQuaternion(camera.object3D.quaternion);
+      //bullet comes out of gunPosition
+bullet.setAttribute('position', gunPosition);
+//current posiiton + (direction * distance), direction of bullet and the distance it travels
+bullet.setAttribute('animation', {
+  property: 'position',
+  to: `${gunPosition.x + dir.x * 50} ${gunPosition.y + dir.y * 50} ${gunPosition.z + dir.z * 50}`,
+  dur: 2000,
+  easing: 'linear'//no bulelt drop and constant acceleration
+});
+//bullets exist for 2 seconds
+scene.appendChild(bullet);
+setTimeout(() => scene.removeChild(bullet), 2000);
+      });
+      </script>
+
   </body>
 </html>
